@@ -24,7 +24,7 @@
         "name": "Steve-Mcl"
     },
     "node-red": {
-        "version": ">=0.20.0",
+        "version": ">=1.0.0",
         "nodes": {
             "buffer-parser": "buffer-parser.js",
             "buffer-maker": "buffer-maker.js"
@@ -43,11 +43,23 @@
     },
     "scripts": {
         "publish": "npm publish",
-        "test": "mocha \"test/**/*_spec.js\""
+        "test": "mocha \"test/**/*_spec.js\" --exit",
+        "lint": "eslint -c .eslintrc --ext js,html \"*.js\" \"*.html\"",
+        "lint:fix": "eslint -c .eslintrc --ext js,html \"*.js\"  \"*.html\" --fix"
     },
     "devDependencies": {
-        "mocha": "^8.2.1",
-        "node-red-node-test-helper": "^0.2.5",
+        "eslint": "^8.57.0",
+        "eslint-config-standard": "^17.1.0",
+        "eslint-plugin-html": "^7.1.0",
+        "eslint-plugin-n": "^16.6.2",
+        "eslint-plugin-standard": "^5.0.0",
+        "node-red-node-test-helper": "^0.3.4",
+        "node-red": "^3.0.0",
+        "eslint-plugin-no-only-tests": "^3.1.0",
+        "mocha": "^11.7.1",
         "should": "^13.2.3"
+    },
+    "overrides": {
+        "form-data": "4.0.4"
     }
 }
