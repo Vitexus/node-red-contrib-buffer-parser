@@ -15,368 +15,359 @@ copies or substantial portions of the Software.
 -->
 
 <script type="text/javascript">
-
 (function () {
-    //console.log("Initialising buffer-maker"); //uncomment me to help locate SRC in devtools!
-    var compatibleDataTypes = {
-        'int': 'int8',
-        'uint': 'uint8',
-        'int16': 'int16be',
-        'uint16': 'uint16be',
-        'int32': 'int32be',
-        'uint32': 'uint32be',
-        'bigint64': 'bigint64be',
-        'biguint64': 'biguint64be',
-        'float': 'floatbe',
-        'double': 'doublebe',
+    // console.log("Initialising buffer-maker"); //uncomment me to help locate SRC in devtools!
+    const compatibleDataTypes = {
+        int: 'int8',
+        uint: 'uint8',
+        int16: 'int16be',
+        uint16: 'uint16be',
+        int32: 'int32be',
+        uint32: 'uint32be',
+        bigint64: 'bigint64be',
+        biguint64: 'biguint64be',
+        float: 'floatbe',
+        double: 'doublebe',
         '16bit': '16bitbe',
-        'boolean': 'bool'
+        boolean: 'bool'
     }
-    function coerceDataType(t) {
-        return compatibleDataTypes[t] || t;
+    function coerceDataType (t) {
+        return compatibleDataTypes[t] || t
     }
-    function setupTypedInput(varName, allowableTypes, defType, defVal, isOptional, width) {
-        var node = this;
-        console.log("setupTypedInput", varName, allowableTypes, defType, defVal, isOptional, width);
-        //TODO: move to common library
-        function isObject(val) {
-            if (val === null) { return false; }
-            return (typeof val === 'object');
-        };
-        function isNumeric(n) {
-            return n !== '' && !isNaN(parseFloat(n)) && isFinite(n);
-        };
-        function isTypeInArray(arr, findType) {
+    function setupTypedInput (varName, allowableTypes, defType, defVal, isOptional, width) {
+        const node = this
+        // console.log('setupTypedInput', varName, allowableTypes, defType, defVal, isOptional, width)
+        // TODO: move to common library
+        function isObject (val) {
+            if (val === null) { return false }
+            return (typeof val === 'object')
+        }
+        // TODO: move to common library
+        // function isNumeric (n) {
+        //     return n !== '' && !isNaN(parseFloat(n)) && isFinite(n)
+        // }
+        function isTypeInArray (arr, findType) {
             try {
-                var typeToFind = findType;
-                if (isObject(findType))
-                    typeToFind = findType.value;
-                for (var index = 0; index < arr.length; index++) {
-                    var element = arr[index];
-                    var thisType = isObject(element) ? element.value : element;
-                    if (thisType === typeToFind) return true;
+                let typeToFind = findType
+                if (isObject(findType)) { typeToFind = findType.value }
+                for (let index = 0; index < arr.length; index++) {
+                    const element = arr[index]
+                    const thisType = isObject(element) ? element.value : element
+                    if (thisType === typeToFind) return true
                 }
             } catch (error) { }
-            return false;
+            return false
         }
 
-        var varSel = "#node-input-" + varName;
-        var typeSel = varSel + "Type";
-        var currentValue = node[varName];
-        var currentType = node[varName + "Type"];
-        var defShouldHaveNoValue = false;
-        //if optional but 'none' is not yet an option - add it as first option in allowableTypes
+        const varSel = '#node-input-' + varName
+        const typeSel = varSel + 'Type'
+        let currentValue = node[varName]
+        let currentType = node[varName + 'Type']
+        // if optional but 'none' is not yet an option - add it as first option in allowableTypes
         if (isOptional === true) {
-            if (!isTypeInArray(allowableTypes, "none")) {
-                allowableTypes.unshift("none");
+            if (!isTypeInArray(allowableTypes, 'none')) {
+                allowableTypes.unshift('none')
             }
         }
 
-        //if defType is not in the list of parameter type, change defType to 1st item
+        // if defType is not in the list of parameter type, change defType to 1st item
         if (!isTypeInArray(allowableTypes, defType)) {
-            var _firstType = allowableTypes[0];
+            let _firstType = allowableTypes[0]
             if (isObject(_firstType)) {
-                _firstType = _firstType.value;
-                defShouldHaveNoValue = _firstType.hasValue == false;
+                _firstType = _firstType.value
             }
-            defType = _firstType;
+            defType = _firstType
         }
 
-        //if currently set type is not in the list of parameter types, set currentType to defType
+        // if currently set type is not in the list of parameter types, set currentType to defType
         if (!isTypeInArray(allowableTypes, currentType)) {
-            currentType = defType;
+            currentType = defType
         }
 
-        //catch all
+        // catch all
         if (!currentType) {
-            currentType = defType || "";
+            currentType = defType || ''
         }
 
-        var $ti = $(varSel);
-        var alreadyBuilt = $ti.data("built") == true;
+        const $ti = $(varSel)
+        const alreadyBuilt = $ti.data('built') === true || $ti.data('built') === 'true'
         if (alreadyBuilt) {
-            //already built? just update types :)
-            $ti.typedInput("types", allowableTypes);
+            // already built? just update types :)
+            $ti.typedInput('types', allowableTypes)
         } else {
-            var opts = {
+            const opts = {
                 default: defType,
                 typeField: $(typeSel),
                 types: allowableTypes
-            };
-            if (isOptional) {
-                opts.default = defType || "none";
-                opts.validate = function (v) {
-                    //todo - handle this when spec changes
-                    return !!v;
-                };
             }
-            $ti.typedInput(opts);
-            $ti.data("built", true);
+            if (isOptional) {
+                opts.default = defType || 'none'
+                opts.validate = function (v) {
+                    // todo - handle this when spec changes
+                    return !!v
+                }
+            }
+            $ti.typedInput(opts)
+            $ti.data('built', true)
         }
 
-        if (currentValue && currentType == "bool") {
-            currentValue  = (currentValue === true || currentValue === "true") ? "true" : "false";
+        if (currentValue && currentType === 'bool') {
+            currentValue = (currentValue === true || currentValue === 'true') ? 'true' : 'false'
         }
 
-        $ti.typedInput("type", currentType);
-        $ti.typedInput("value", currentValue);
+        $ti.typedInput('type', currentType)
+        $ti.typedInput('value', currentValue)
 
-        if (width) $ti.typedInput("width", width);
-        return $ti;
+        if (width) $ti.typedInput('width', width)
+        return $ti
     }
 
-    function getEditItem(index) {
+    function getEditItem (index) {
         try {
-            var items = $("#node-input-items-container").editableList('items');
-            var r = parseEditItem(items[index]);
-            return parseEditItem(items[index]);
+            const items = $('#node-input-items-container').editableList('items')
+            const r = parseEditItem(items[index], index)
+            return r
         } catch (error) { }
-        return null;
+        return null
     }
 
-    function parseEditItem($row) {
+    function parseEditItem ($row, index) {
         try {
-            var rule = $($row);
-            var r = {};
-            r.name = rule.find(".node-input-item-property-name").val() || "item" + (i + 1);
-            r.type = rule.find(".node-input-item-property-type").val() || "int16be";
-            r.length = parseInt(rule.find(".node-input-item-property-length").val() || 1);
-            var d = $(rule.find(".node-input-item-property-data"));
-            r.dataType =  d.typedInput("type");
-            r.data =  d.typedInput("value");
-            return r;
+            const rule = $($row)
+            const r = {}
+            r.name = rule.find('.node-input-item-property-name').val() || 'item' + (index + 1)
+            r.type = rule.find('.node-input-item-property-type').val() || 'int16be'
+            r.length = parseInt(rule.find('.node-input-item-property-length').val() || 1)
+            const d = $(rule.find('.node-input-item-property-data'))
+            r.dataType = d.typedInput('type')
+            r.data = d.typedInput('value')
+            return r
         } catch (error) { }
-        return null;
+        return null
     }
 
     RED.nodes.registerType('buffer-maker', {
         category: 'parser',
         color: '#0090d4',
         defaults: {
-            name: { value: "" },
-            specification: { value: "" },
-            specificationType: { value: "ui" },
-            items: { value: [{ name: "item1", type: "int16be", data: "payload", dataType: "msg" }], required: true },
-            swap1: { value: "" },
-            swap2: { value: "" },
-            swap3: { value: "" },
-            swap1Type: { value: "swap" },
-            swap2Type: { value: "swap" },
-            swap3Type: { value: "swap" },
-            msgProperty: { value: "payload" },
-            msgPropertyType: { value: "str" },
+            name: { value: '' },
+            specification: { value: '' },
+            specificationType: { value: 'ui' },
+            items: { value: [{ name: 'item1', type: 'int16be', data: 'payload', dataType: 'msg' }], required: true },
+            swap1: { value: '' },
+            swap2: { value: '' },
+            swap3: { value: '' },
+            swap1Type: { value: 'swap' },
+            swap2Type: { value: 'swap' },
+            swap3Type: { value: 'swap' },
+            msgProperty: { value: 'payload' },
+            msgPropertyType: { value: 'str' }
         },
         inputs: 1,
         outputs: 1,
-        icon: "font-awesome/fa-compress",
+        icon: 'font-awesome/fa-compress',
         label: function () {
-            return this.name || "buffer maker";
+            return this.name || 'buffer maker'
         },
         oneditprepare: function () {
             // console.log("buffer-maker->oneditprepare()")
-            var node = this;
+            const node = this
 
-            var sti = setupTypedInput.bind(this);
-            var specOpt = {
-                value: "ui",
-                label: "UI Specification",
+            const sti = setupTypedInput.bind(node)
+            const specOpt = {
+                value: 'ui',
+                label: 'UI Specification',
                 hasValue: false
             }
-            var swapOpt = {
-                value: "swap",
-                label: "Swap",
-                title: "Swap",
+            const swapOpt = {
+                value: 'swap',
+                label: 'Swap',
+                title: 'Swap',
                 showLabel: true,
                 // icon:"fa fa-exchange",
                 options: [
-                    { label: "none", value: '', title: '' },
-                    { label: "16", value: 'swap16', title: 'Interprets data as an array of 16-bit integers and swaps the byte order in-place' },
-                    { label: "32", value: 'swap32', title: 'Interprets data as an array of 32-bit integers and swaps the byte order in-place' },
-                    { label: "64", value: 'swap64', title: 'Interprets data as an array of 64-bit integers and swaps the byte order in-place' },
+                    { label: 'none', value: '', title: '' },
+                    { label: '16', value: 'swap16', title: 'Interprets data as an array of 16-bit integers and swaps the byte order in-place' },
+                    { label: '32', value: 'swap32', title: 'Interprets data as an array of 32-bit integers and swaps the byte order in-place' },
+                    { label: '64', value: 'swap64', title: 'Interprets data as an array of 64-bit integers and swaps the byte order in-place' }
                 ],
-                default: "none"
+                default: 'none'
             }
 
-            sti('data', ['msg', 'json', 'bin'], 'msg');//data
-            var specificationField = sti('specification', [specOpt, 'msg', 'flow', 'global'], 'ui');//specification
-            var sw1 = sti('swap1', [swapOpt, 'json', 'msg', 'flow', 'global', 'env'], 'swap');//specification
-            var sw2 = sti('swap2', [swapOpt], 'swap');//specification
-            var sw3 = sti('swap3', [swapOpt], 'swap');//specification
-            var msgPropertyField = $("#node-input-msgProperty").typedInput({ types: [{ label: "msg.", value: "str" }] });
-            specificationField.on("change", function () {
-                var v = $(this).val();
-                var t = specificationField.typedInput("type");
-                if (t == "ui") {
-                    $(".ui-row").show();
-                    if (!v) specificationField.typedInput("value", "spec");
-                    console.log("calling RED.tray.resize();")
-                    RED.tray.resize();
+            sti('data', ['msg', 'json', 'bin'], 'msg')// data
+            const specificationField = sti('specification', [specOpt, 'msg', 'flow', 'global'], 'ui')// specification
+            const sw1 = sti('swap1', [swapOpt, 'json', 'msg', 'flow', 'global', 'env'], 'swap')// specification
+            const sw2 = sti('swap2', [swapOpt], 'swap')// specification
+            const sw3 = sti('swap3', [swapOpt], 'swap')// specification
+            // const msgPropertyField = $('#node-input-msgProperty').typedInput({ types: [{ label: 'msg.', value: 'str' }] })
+            specificationField.on('change', function () {
+                const v = $(node).val()
+                const t = specificationField.typedInput('type')
+                if (t === 'ui') {
+                    $('.ui-row').show()
+                    if (!v) specificationField.typedInput('value', 'spec')
+                    // console.log('calling RED.tray.resize();')
+                    RED.tray.resize()
                 } else {
-                    $(".ui-row").hide();
-                    console.log("calling RED.tray.resize();")
-                    RED.tray.resize();
+                    $('.ui-row').hide()
+                    // console.log('calling RED.tray.resize();')
+                    RED.tray.resize()
                 }
-            });
+            })
 
-
-            sw1.on("change", function () {
-                var v = $(this).val();
-                var t = $(this).typedInput("type");
-                if (t != "swap" || !v || v == "none") {
-                    sw1.typedInput("width", "70%");
-                    sw2.typedInput('hide');
+            sw1.on('change', function () {
+                const v = $(this).val()
+                const t = $(this).typedInput('type')
+                if (t !== 'swap' || !v || v === 'none') {
+                    sw1.typedInput('width', '70%')
+                    sw2.typedInput('hide')
                 } else {
-                    sw1.typedInput("width", "23%");
-                    sw2.typedInput('show');
+                    sw1.typedInput('width', '23%')
+                    sw2.typedInput('show')
                 }
-                sw2.change();
-            });
-            sw2.on("change", function () {
-                var v1 = sw1.val();
-                var v2 = sw2.val();
-                var t = sw1.typedInput("type");
-                if (t != "swap" || !v1 || !v2 || v1 == "none" || v2 == "none") {
-                    sw3.typedInput('hide');
+                sw2.change()
+            })
+            sw2.on('change', function () {
+                const v1 = sw1.val()
+                const v2 = sw2.val()
+                const t = sw1.typedInput('type')
+                if (t !== 'swap' || !v1 || !v2 || v1 === 'none' || v2 === 'none') {
+                    sw3.typedInput('hide')
                 } else {
-                    sw3.typedInput('show');
+                    sw3.typedInput('show')
                 }
-            });
+            })
 
             $('#node-input-items-container').css('min-height', '150px').css('min-width', '500px').editableList({
                 addItem: function (container, i, opt) {
-                    var rule = opt;
-                    if (!rule.hasOwnProperty('type')) {
-                        //its a newly added item!
-                        rule = { type: "int16be", name: "item" + (i + 1), length: 1, dataType: "msg", data: "payload" };//default
-                        var prev = i > 0 ? getEditItem(i - 1) : null;
+                    let rule = opt
+                    if (!Object.prototype.hasOwnProperty.call(rule, 'type')) {
+                        // its a newly added item!
+                        rule = { type: 'int16be', name: 'item' + (i + 1), length: 1, dataType: 'msg', data: 'payload' }// default
+                        const prev = i > 0 ? getEditItem(i - 1) : null
                         if (prev && prev.type != null) {
-                            var byteOffsetMultiplier = 0;
-                            var bitOffset = 0;
-                            rule.type = prev.type;
-                            rule.length = prev.length;
-                            rule.data = prev.data;
-                            rule.dataType = prev.dataType;
+                            rule.type = prev.type
+                            rule.length = prev.length
+                            rule.data = prev.data
+                            rule.dataType = prev.dataType
                         }
                     }
 
                     container.css({
                         overflow: 'hidden',
                         whiteSpace: 'nowrap'
-                    });
-                    let fragment = document.createDocumentFragment();
-                    var row1 = $('<div/>', { style: "display:flex;", class: "buffer-maker-row" }).appendTo(fragment);
+                    })
+                    const fragment = document.createDocumentFragment()
+                    const row1 = $('<div/>', { style: 'display:flex;', class: 'buffer-maker-row' }).appendTo(fragment)
 
-                    var _types = {
-                        value: "type",
-                        label: "Type",
+                    const _types = {
+                        value: 'type',
+                        label: 'Type',
                         showLabel: true,
                         options: [
-                            { value: "byte", label: "byte" },
-                            { value: "int8", label: "int8" },
-                            { value: "uint8", label: "uint8" },
-                            { value: "int16le", label: "int16 (le)" },
-                            { value: "int16be", label: "int16 (be)" },
-                            { value: "uint16le", label: "uint16 (le)" },
-                            { value: "uint16be", label: "uint16 (be)" },
-                            { value: "int32le", label: "int32 (le)" },
-                            { value: "int32be", label: "int32 (be)" },
-                            { value: "uint32le", label: "uint32 (le)" },
-                            { value: "uint32be", label: "uint32 (be)" },
-                            { value: "bigint64le", label: "bigint64 (le)" },
-                            { value: "bigint64be", label: "bigint64 (be)" },
-                            { value: "biguint64le", label: "biguint64 (le)" },
-                            { value: "biguint64be", label: "biguint64 (be)" },
-                            { value: "floatle", label: "float (le)" },
-                            { value: "floatbe", label: "float (be)" },
-                            { value: "doublele", label: "double (le)" },
-                            { value: "doublebe", label: "double (be)" },
-                            { value: "8bit", label: "8bit" },
-                            { value: "16bitle", label: "16bit (le)" },
-                            { value: "16bitbe", label: "16bit (be)" },
-                            { value: "bool", label: "bool" },
-                            { value: "bcdle", label: "bcd (le)" },
-                            { value: "bcdbe", label: "bcd (be)" },
-                            { value: "string", label: "string" },
-                            { value: "hex", label: "hex" },
-                            { value: "ascii", label: "ascii" },
-                            { value: "utf8", label: "utf8" },
-                            { value: "utf16le", label: "utf16 (le)" },
-                            { value: "ucs2", label: "ucs2" },
-                            { value: "latin1", label: "latin1" },
-                            { value: "binary", label: "binary" },
-                            { value: "buffer", label: "buffer" },
+                            { value: 'byte', label: 'byte' },
+                            { value: 'int8', label: 'int8' },
+                            { value: 'uint8', label: 'uint8' },
+                            { value: 'int16le', label: 'int16 (le)' },
+                            { value: 'int16be', label: 'int16 (be)' },
+                            { value: 'uint16le', label: 'uint16 (le)' },
+                            { value: 'uint16be', label: 'uint16 (be)' },
+                            { value: 'int32le', label: 'int32 (le)' },
+                            { value: 'int32be', label: 'int32 (be)' },
+                            { value: 'uint32le', label: 'uint32 (le)' },
+                            { value: 'uint32be', label: 'uint32 (be)' },
+                            { value: 'bigint64le', label: 'bigint64 (le)' },
+                            { value: 'bigint64be', label: 'bigint64 (be)' },
+                            { value: 'biguint64le', label: 'biguint64 (le)' },
+                            { value: 'biguint64be', label: 'biguint64 (be)' },
+                            { value: 'floatle', label: 'float (le)' },
+                            { value: 'floatbe', label: 'float (be)' },
+                            { value: 'doublele', label: 'double (le)' },
+                            { value: 'doublebe', label: 'double (be)' },
+                            { value: '8bit', label: '8bit' },
+                            { value: '16bitle', label: '16bit (le)' },
+                            { value: '16bitbe', label: '16bit (be)' },
+                            { value: 'bool', label: 'bool' },
+                            { value: 'bcdle', label: 'bcd (le)' },
+                            { value: 'bcdbe', label: 'bcd (be)' },
+                            { value: 'string', label: 'string' },
+                            { value: 'hex', label: 'hex' },
+                            { value: 'ascii', label: 'ascii' },
+                            { value: 'utf8', label: 'utf8' },
+                            { value: 'utf16le', label: 'utf16 (le)' },
+                            { value: 'ucs2', label: 'ucs2' },
+                            { value: 'latin1', label: 'latin1' },
+                            { value: 'binary', label: 'binary' },
+                            { value: 'buffer', label: 'buffer' }
                         ]
                     }
 
+                    const row1Item1 = $('<div/>', { style: 'display:flex;', class: 'buffer-maker-row-item' }).appendTo(row1)
+                    const nameField = $('<input/>', { class: 'node-input-item-property-name', type: 'text', width: '125px' })
+                        .appendTo(row1Item1)
+                        .typedInput({ types: [{ label: 'Name', value: 'str' }] })
 
-                    let row1_1 = $('<div/>', { style: "display:flex;", class: "buffer-maker-row-item" }).appendTo(row1);
-                    let nameField = $('<input/>', { class: "node-input-item-property-name", type: "text", width: "125px" })
-                        .appendTo(row1_1)
-                        .typedInput({ types: [{ label: "Name", value: "str" }] })
-
-                    let row1_2 = $('<div/>', { style: "display:flex;", class: "buffer-maker-row-item" }).appendTo(row1);
-                    let typeField = $('<input/>', { class: "node-input-item-property-type", type: "text", width: "165px" })
-                        .appendTo(row1_2)
+                    const row1Item2 = $('<div/>', { style: 'display:flex;', class: 'buffer-maker-row-item' }).appendTo(row1)
+                    const typeField = $('<input/>', { class: 'node-input-item-property-type', type: 'text', width: '165px' })
+                        .appendTo(row1Item2)
                         .typedInput({ types: [_types] })
-                        
-                    let row1_3 = $('<div/>', { style: "display:flex;", class: "buffer-maker-row-item" }).appendTo(row1);
-                    let lengthField = $('<input/>', { class: "node-input-item-property-length", type: "number", min: "0", width: "110px" })
-                    .appendTo(row1_3)
-                    .typedInput({ types: [{ label: "Length", value: "num" }] })
 
-                    let row1_4 = $('<div/>', { style: "display:flex;", class: "buffer-maker-row-item" }).appendTo(row1);
-                    let dataField = $('<input/>', { class: "node-input-item-property-data", type: "text", min: "0", width: "155px" })
-                        .appendTo(row1_4)
-                        .typedInput({ types: ['msg','flow','global','str','num','bool','bin','jsonata','env']});
-                   
-                    rule.type = coerceDataType(rule.type);
-                    typeField.typedInput('type', "type");
-                    typeField.typedInput('value', rule.type || "int16be");
-                    nameField.typedInput('type', "str");
-                    nameField.typedInput('value', rule.name || ("item" + (i + 1)));
-                    dataField.typedInput('type', rule.dataType || "msg");
-                    dataField.typedInput('value', rule.data || "payload");
-                    lengthField.typedInput('type', "num");
-                    lengthField.typedInput('value', rule.length || 1);
+                    const row1Item3 = $('<div/>', { style: 'display:flex;', class: 'buffer-maker-row-item' }).appendTo(row1)
+                    const lengthField = $('<input/>', { class: 'node-input-item-property-length', type: 'number', min: '0', width: '110px' })
+                        .appendTo(row1Item3)
+                        .typedInput({ types: [{ label: 'Length', value: 'num' }] })
 
-                    container[0].appendChild(fragment);
+                    const row1Item4 = $('<div/>', { style: 'display:flex;', class: 'buffer-maker-row-item' }).appendTo(row1)
+                    const dataField = $('<input/>', { class: 'node-input-item-property-data', type: 'text', min: '0', width: '155px' })
+                        .appendTo(row1Item4)
+                        .typedInput({ types: ['msg', 'flow', 'global', 'str', 'num', 'bool', 'bin', 'jsonata', 'env'] })
+
+                    rule.type = coerceDataType(rule.type)
+                    typeField.typedInput('type', 'type')
+                    typeField.typedInput('value', rule.type || 'int16be')
+                    nameField.typedInput('type', 'str')
+                    nameField.typedInput('value', rule.name || ('item' + (i + 1)))
+                    dataField.typedInput('type', rule.dataType || 'msg')
+                    dataField.typedInput('value', rule.data || 'payload')
+                    lengthField.typedInput('type', 'num')
+                    lengthField.typedInput('value', rule.length || 1)
+
+                    container[0].appendChild(fragment)
                 },
                 removable: true,
                 sortable: true
-            });
+            })
 
-            for (var i = 0; i < this.items.length; i++) {
-                var item = this.items[i];
-                $("#node-input-items-container").editableList('addItem', item);
+            for (let i = 0; i < this.items.length; i++) {
+                const item = this.items[i]
+                $('#node-input-items-container').editableList('addItem', item)
             }
-
         },
         oneditsave: function () {
-            var items = $("#node-input-items-container").editableList('items');
-            var node = this;
-            node.items = [];
+            const items = $('#node-input-items-container').editableList('items')
+            const node = this
+            node.items = []
             items.each(function (i) {
-                var rule = $(this);
-                var r = parseEditItem(rule);
-                node.items.push(r);
-            });
+                const rule = $(this)
+                const r = parseEditItem(rule, i)
+                node.items.push(r)
+            })
         },
         oneditresize: function (size) {
-            console.log("inside oneditresize");
-            var rows = $("#dialog-form>div:not(.node-input-items-container-row)");
-            var height = size.height;
-            for (var i = 0; i < rows.length; i++) {
-                height -= $(rows[i]).outerHeight(true);
+            // console.log('inside oneditresize')
+            const rows = $('#dialog-form>div:not(.node-input-items-container-row)')
+            let height = size.height
+            for (let i = 0; i < rows.length; i++) {
+                height -= $(rows[i]).outerHeight(true)
             }
-            var editorRow = $("#dialog-form>div.node-input-items-container-row");
-            height -= (parseInt(editorRow.css("marginTop")) + parseInt(editorRow.css("marginBottom")));
-            height += 16;
-            $("#node-input-items-container").editableList('height', height);
+            const editorRow = $('#dialog-form>div.node-input-items-container-row')
+            height -= (parseInt(editorRow.css('marginTop')) + parseInt(editorRow.css('marginBottom')))
+            height += 16
+            $('#node-input-items-container').editableList('height', height)
         }
 
-    });
+    })
 })()
-
 </script>
 
 <script type="text/html" data-template-name="buffer-maker">
@@ -431,16 +422,16 @@ copies or substantial portions of the Software.
     span.buffer-maker-prop-name {
         padding: 0px 3px 2px 3px;
         margin: 1px;
-        color: #AD1625;
+        /* color: #AD1625; */
         white-space: nowrap;
-        background-color: #f7f7f9;
+        /* background-color: #f7f7f9; */
         border: 1px solid #e1e1e8;
         border-radius: 2px;
         font-family: monospace;
     }
 
     span.buffer-maker-prop-type {
-        color: #666;
+        /* color: #666; */
         font-style: italic;
         font-size: smaller;
         padding-left: 5px;
