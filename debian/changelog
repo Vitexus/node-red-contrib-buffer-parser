@@ -1,0 +1,5 @@
+node-red-contrib-buffer-parser (3.2.3) unstable; urgency=medium
+
+  * Initial Debian packaging of node-red-contrib-buffer-parser.
+
+ -- Vítězslav Dvořák <info@vitexsoftware.cz>  Tue, 09 Jun 2026 13:20:00 +0200

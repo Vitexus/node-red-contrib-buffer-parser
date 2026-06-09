@@ -1,0 +1,22 @@
+Source: node-red-contrib-buffer-parser
+Section: javascript
+Priority: optional
+Maintainer: Vítězslav Dvořák <info@vitexsoftware.cz>
+Build-Depends:
+ debhelper-compat (= 13),
+ dh-nodejs | pkg-js-tools,
+ appstream
+Standards-Version: 4.7.0
+Homepage: https://github.com/Steve-Mcl/node-red-contrib-buffer-parser
+Rules-Requires-Root: no
+
+Package: node-red-contrib-buffer-parser
+Architecture: all
+Multi-Arch: foreign
+Depends:
+ ${misc:Depends},
+ node-red (>= 4.0)
+Description: Node-RED nodes to convert values to and from buffers
+ Node-RED nodes to convert values to and from buffers and arrays.
+ Supports big and little endian, BCD, byte swapping, bit manipulation
+ and many numeric formats, commonly used with Modbus and serial data.

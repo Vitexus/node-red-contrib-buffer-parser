@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="addon">
+  <id>io.github.vitexus.node_red_contrib_buffer_parser</id>
+  <extends>io.github.vitexus.node_red</extends>
+  <metadata_license>MIT</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Node-RED Buffer Parser</name>
+  <summary>Node-RED nodes to convert values to and from buffers</summary>
+  <description>
+    <p>Node-RED nodes to convert values to and from buffers and arrays.
+Supports big and little endian, BCD, byte swapping, bit manipulation
+and many numeric formats, commonly used with Modbus and serial data.</p>
+  </description>
+  <url type="homepage">https://github.com/Steve-Mcl/node-red-contrib-buffer-parser</url>
+  <url type="vcs-browser">https://github.com/Vitexus/node-red-contrib-buffer-parser</url>
+  <developer id="io.github.vitexus">
+    <name>VitexSoftware</name>
+  </developer>
+  <content_rating type="oars-1.1"/>
+  <releases>
+    <release version="3.2.2" date="2026-06-09"/>
+  </releases>
+</component>
